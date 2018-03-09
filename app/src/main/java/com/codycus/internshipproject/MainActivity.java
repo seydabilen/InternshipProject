@@ -20,8 +20,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rootLayout = (ViewGroup) findViewById(R.id.view_root);
-        myInteractiveView =new InteractiveView(this);
+        FrameLayout.LayoutParams inreactiveViewLayoutParams = new FrameLayout.LayoutParams(400, 400);
+        FrameLayout.LayoutParams inreactiveViewLayoutParams2 = new FrameLayout.LayoutParams(400, 400);
 
+        InteractiveView firstInteractiveView = new InteractiveView(this);
+        firstInteractiveView.setText("Button1");
+        rootLayout.addView(firstInteractiveView, inreactiveViewLayoutParams);
+
+       /* InteractiveView secondInteractiveView = new InteractiveView(this);
+        secondInteractiveView.setText("Button2");
+        rootLayout.addView(secondInteractiveView, inreactiveViewLayoutParams2);*/
 
     }
 
