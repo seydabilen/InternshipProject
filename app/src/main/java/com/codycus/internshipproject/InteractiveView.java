@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -16,13 +14,16 @@ import android.widget.Toast;
 
 public class InteractiveView extends android.support.v7.widget.AppCompatButton implements View.OnTouchListener {
 
-    private Button mainButton;
+
     private int _xdelta;
     private int _ydelta;
     private float startPosX;
     private float startPosY;
     private float destinationPos;
 
+
+
+   
 
     public InteractiveView(Context context) {
         super(context);
@@ -33,15 +34,16 @@ public class InteractiveView extends android.support.v7.widget.AppCompatButton i
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-
         int X = (int) event.getRawX();//ilk pozisyon
         int Y = (int) event.getRawY();
+
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 FrameLayout.LayoutParams lParams = (FrameLayout.LayoutParams) v.getLayoutParams();
+
                 _xdelta = X - lParams.leftMargin;//start noktası
-                _ydelta = Y - lParams.topMargin;
+                _ydelta = Y - lParams.topMargin;//
                 v.setScaleX(v.getScaleX() + 0.5f);
                 v.setScaleY(v.getScaleY() + 0.5f);
                 break;
@@ -50,7 +52,9 @@ public class InteractiveView extends android.support.v7.widget.AppCompatButton i
                 v.setBackgroundColor(Color.rgb(28, 118, 187));
                 v.setScaleX(1);
                 v.setScaleY(1);
-                returnToOriginalPosition(v);
+                lParams1.leftMargin=X-_xdelta;
+                lParams1.topMargin=Y-_ydelta;
+                returnToOriginalPosition(lParams1.leftMargin,lParams1.topMargin,0,0);
 
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -75,28 +79,17 @@ public class InteractiveView extends android.support.v7.widget.AppCompatButton i
         invalidate();
         return true;
     }
-    public void returnToOriginalPosition(View view){
+    public void returnToOriginalPosition(int left,int top,int right,int bottom){
+        Toast.makeText(getContext(),"X:"+left+"Y:"+top,Toast.LENGTH_LONG).show();
+        //TranslateAnimation anim = new TranslateAnimation(right, -left,bottom, -top);
+        //anim.setDuration(500);
+        //anim.setFillAfter(true);
+        //this.startAnimation(anim);
 
-        int[] loc = new int[2];
-        int[] loc2 = new int[2];
-        view.getLocationOnScreen(loc);
-        view.getLocationInWindow(loc2);
-
-        final int x = loc[0];
-        final int y = loc[1];
-        final int a = loc[0];
-        final int b = loc[1];
-
-            Toast.makeText(getContext(),"X:"+x+"Y:"+y,Toast.LENGTH_LONG).show();
-            TranslateAnimation anim = new TranslateAnimation(x,0,y,0);
-            anim.setDuration(3000);
-            anim.setFillAfter(true);
-            view.startAnimation(anim);
-            /*Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.slide_left_out);
-            anim.setFillAfter(true);
-            view.startAnimation(anim);*/
-
-
+        this.setX(this.getX() -left);
+        this.setY( this.getY() -top);
+        _xdelta = 0;
+        _ydelta = 0;
     }
 
 }
