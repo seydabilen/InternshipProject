@@ -4,12 +4,13 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
     private ViewGroup rootLayout;
 
-
+    private PuzzleEngine puzzleEngine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,13 @@ public class MainActivity extends AppCompatActivity {
         secondInteractiveView.setText("Button2");
         rootLayout.addView(secondInteractiveView, inreactiveViewLayoutParams2);*/
 
+
+        puzzleEngine = new PuzzleEngine();
+        firstInteractiveView.setInteractiveViewListener(puzzleEngine);
+
+        ImageView imageView = (ImageView) findViewById(R.id.targetView);
+        puzzleEngine.setTargetView(imageView);
+        puzzleEngine.setCanvasView(rootLayout);
     }
 
 

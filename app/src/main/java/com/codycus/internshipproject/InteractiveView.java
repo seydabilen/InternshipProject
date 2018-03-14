@@ -13,9 +13,13 @@ import android.widget.FrameLayout;
 
 public class InteractiveView extends android.support.v7.widget.AppCompatButton implements View.OnTouchListener {
 
-
     private int _xdelta;
     private int _ydelta;
+    private InteractiveViewListener interactiveViewListener;
+
+    public interface InteractiveViewListener{
+        public void onDropView(InteractiveView view, MotionEvent event);
+    }
 
     public InteractiveView(Context context) {
         super(context);
@@ -45,7 +49,7 @@ public class InteractiveView extends android.support.v7.widget.AppCompatButton i
                 lParams1.leftMargin=X-_xdelta;
                 lParams1.topMargin=Y-_ydelta;
                 returnToOriginalPosition(lParams1.leftMargin,lParams1.topMargin,0,0);
-
+                interactiveViewListener.onDropView(this, event);
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 break;
@@ -67,7 +71,8 @@ public class InteractiveView extends android.support.v7.widget.AppCompatButton i
         invalidate();
         return true;
     }
-    public void returnToOriginalPosition(int left,int top,int right,int bottom){
+
+    public void returnToOriginalPosition(int left, int top, int right, int bottom){
       /* Toast.makeText(getContext(),"X:"+left+"Y:"+top,Toast.LENGTH_LONG).show();
         TranslateAnimation anim = new TranslateAnimation(right, -left,bottom, -top);
         anim.setDuration(500);
@@ -78,6 +83,10 @@ public class InteractiveView extends android.support.v7.widget.AppCompatButton i
         this.setY( this.getY() -top);
         _xdelta = 0;
         _ydelta = 0;
+    }
+
+    public void setInteractiveViewListener(InteractiveViewListener interactiveViewListener) {
+        this.interactiveViewListener = interactiveViewListener;
     }
 
 }
