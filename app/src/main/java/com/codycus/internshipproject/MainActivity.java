@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rootLayout = (ViewGroup) findViewById(R.id.view_root);
-        ImageView targetView= (ImageView)findViewById(R.id.targetView);
 
         FrameLayout.LayoutParams inreactiveViewLayoutParams = new FrameLayout.LayoutParams(400, 400);
         FrameLayout.LayoutParams inreactiveViewLayoutParams2 = new FrameLayout.LayoutParams(400, 400);
