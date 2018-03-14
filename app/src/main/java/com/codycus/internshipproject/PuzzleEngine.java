@@ -16,7 +16,6 @@ public class PuzzleEngine implements InteractiveView.InteractiveViewListener {
     @Override
     public void onDropView(InteractiveView interactiveView, MotionEvent event) {
 
-
         // bizim butun dunyamiz burasi olmali
         // hangi view ne kadar hareket etti
         // ne oldu ne bitti
@@ -33,6 +32,11 @@ public class PuzzleEngine implements InteractiveView.InteractiveViewListener {
         // kaydirma vesaire turu isleri de buradan yonetebiliriz
         //interactiveView.returnToOriginalPosition(0,0,0,0);
 
+        if (ViewUtils.isViewCoversAnother(targetView, interactiveView)) {
+            interactiveView.setVisibility(View.GONE);
+        } else {
+            interactiveView.returnToOriginalPosition();
+        }
     }
 
     public void setTargetView(View targetView) {
