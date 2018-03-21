@@ -25,14 +25,6 @@ public class MainActivity extends AppCompatActivity {
             puzzlePieceView.setText("Piece " + i);
             interactiveViews.add(puzzlePieceView);
         }
-
-
-        puzzleEngine = new PuzzleEngine();
-        firstInteractiveView.setInteractiveViewListener(puzzleEngine);
-
-        ImageView imageView = (ImageView) findViewById(R.id.targetView);
-        puzzleEngine.setTargetView(imageView);
-        puzzleEngine.setCanvasView(rootLayout);
     }
 
 
