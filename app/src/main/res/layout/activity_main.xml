@@ -4,16 +4,14 @@
     android:layout_height="match_parent"
     android:id="@+id/view_root"
     android:orientation="horizontal"
-    android:background="#badbed">
+    android:background="#fff">
 
-
-        <ImageView
-            android:id="@+id/targetView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher"
-            android:layout_marginLeft="200dp"
-            android:visibility="visible"/>
+    <FrameLayout
+        android:background="@drawable/img3"
+        android:id="@+id/target_root"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"></FrameLayout>
 
 
 </FrameLayout>
