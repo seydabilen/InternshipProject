@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
 import java.util.ArrayList;
 import java.util.Random;
 /**
@@ -22,7 +23,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
     private Integer puzzlePieceInitialWidth = 250;
     private Integer targetFrameWidth = 350;
 
-    public ImageView getTargetView(){
+    public ImageView getTargetView() {
         return targetView;
     }
 
@@ -45,20 +46,41 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
         targetView = new ImageView(getContext());
         targetView.setImageResource(R.drawable.puzzlepiecemissing0);
 
-        Integer width =  800;
+        Integer width = 800;
         Integer height = 500;
 
-        targetFrameWidth = randomGenerator.nextInt(100) + puzzlePieceInitialWidth;
-        FrameLayout.LayoutParams targetViewParams = new FrameLayout.LayoutParams(targetFrameWidth,targetFrameWidth);
 
-        targetViewParams.leftMargin=  randomGenerator.nextInt(Math.max(0, (width - targetFrameWidth))) + 1;
-        targetViewParams.topMargin= randomGenerator.nextInt(Math.max(0, (height - targetFrameWidth))) + 1;
+        FrameLayout.LayoutParams targetViewParams = new FrameLayout.LayoutParams(targetFrameWidth, targetFrameWidth);
 
+        while (true) {
+            targetFrameWidth = randomGenerator.nextInt(100) + puzzlePieceInitialWidth;
+            targetViewParams.leftMargin = randomGenerator.nextInt(Math.max(0, (width - targetFrameWidth))) + 1;
+            targetViewParams.topMargin = randomGenerator.nextInt(Math.max(0, (height - targetFrameWidth))) + 1;
+            targetView.setLayoutParams(targetViewParams);
 
-        //TODO: For döngüsü ile diğer InteractiveView targetleri ile kesişip kesişmediğini kontrol edeceğiz.
+            boolean intersects = false;
+            for (int viewIndex = 0; viewIndex < targetViewGroup.getChildCount(); viewIndex++) {
+                View oldTargetView = targetViewGroup.getChildAt(viewIndex);
+                if (isViewsIntersects(oldTargetView, targetView)) {
+                    intersects = true;
+                    break;
+                }
+            }
+
+            if (!intersects) {
+                break;
+            }
+        }
 
         targetViewGroup.addView(targetView, targetViewParams);
 
+    }
+
+    private boolean isViewsIntersects(View a, View b) {
+        return a.getX() < b.getX() + b.getWidth()
+                && a.getX() + a.getWidth() > b.getX()
+                && a.getY() < b.getY() + b.getHeight()
+                && a.getY() + a.getHeight() > b.getY();
     }
 
     @Override
@@ -68,9 +90,9 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                Float ratio = puzzlePieceInitialWidth.floatValue() /targetFrameWidth.floatValue();
-                v.setScaleX(  v.getScaleX()+ratio);
-                v.setScaleY( v.getScaleY()+ratio);
+                Float ratio = puzzlePieceInitialWidth.floatValue() / targetFrameWidth.floatValue();
+                v.setScaleX(v.getScaleX() + ratio);
+                v.setScaleY(v.getScaleY() + ratio);
                 firstPoint = new Point((int) getX(), (int) getY());
                 //Point holds two integer coordinates.0,0
                 break;
@@ -109,7 +131,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
         targetView.getLocationOnScreen(location);
         int targetViewMinX = location[0];
         int targetViewMinY = location[1];
-        Boolean intersects = ( x > targetViewMinX && x < (targetViewMinX + targetView.getWidth()))
+        Boolean intersects = (x > targetViewMinX && x < (targetViewMinX + targetView.getWidth()))
                 && (y > targetViewMinY && y < (targetViewMinY + targetView.getHeight()));
 
         if (intersects) {
