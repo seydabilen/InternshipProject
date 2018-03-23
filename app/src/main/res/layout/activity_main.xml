@@ -3,14 +3,16 @@
     android:id="@+id/view_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#badbed"
-    android:orientation="horizontal">
+    android:background="@color/button_focused"
+    android:orientation="vertical">
+
 
     <FrameLayout
         android:background="@drawable/img3"
         android:id="@+id/target_root"
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
-        android:layout_height="400dp"/>
+        android:layout_height="470dp"/>
+
 
 </FrameLayout>

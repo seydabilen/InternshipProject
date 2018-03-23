@@ -14,7 +14,6 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.Random;
-
 /**
  * Created by Acer on 8.03.2018.
  */
@@ -53,7 +52,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int viewGroupWidth = displayMetrics.widthPixels;
-        int viewGroupHeight = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 400, getResources().getDisplayMetrics());
+        int viewGroupHeight = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 470, getResources().getDisplayMetrics());
 
         while (true) {
             targetFrameWidth = randomGenerator.nextInt(100) + puzzlePieceInitialWidth;
