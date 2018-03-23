@@ -1,8 +1,11 @@
 package com.codycus.internshipproject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,41 +50,39 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
         targetView = new ImageView(getContext());
         targetView.setImageResource(R.drawable.puzzlepiecemissing0);
 
-        Integer width = 800;
-        Integer height = 500;
-
-
-        FrameLayout.LayoutParams targetViewParams = new FrameLayout.LayoutParams(targetFrameWidth, targetFrameWidth);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int viewGroupWidth = displayMetrics.widthPixels;
+        int viewGroupHeight = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 400, getResources().getDisplayMetrics());
 
         while (true) {
             targetFrameWidth = randomGenerator.nextInt(100) + puzzlePieceInitialWidth;
-            targetViewParams.leftMargin = randomGenerator.nextInt(Math.max(0, (width - targetFrameWidth))) + 1;
-            targetViewParams.topMargin = randomGenerator.nextInt(Math.max(0, (height - targetFrameWidth))) + 1;
+            FrameLayout.LayoutParams targetViewParams = new FrameLayout.LayoutParams(targetFrameWidth, targetFrameWidth);
+            targetViewParams.leftMargin = randomGenerator.nextInt(Math.max(0, (viewGroupWidth - targetFrameWidth))) + 1;
+            targetViewParams.topMargin = randomGenerator.nextInt(Math.max(0, (viewGroupHeight - targetFrameWidth))) + 1;
             targetView.setLayoutParams(targetViewParams);
 
             boolean intersects = false;
             for (int viewIndex = 0; viewIndex < targetViewGroup.getChildCount(); viewIndex++) {
                 View oldTargetView = targetViewGroup.getChildAt(viewIndex);
-                if (isViewsIntersects(oldTargetView, targetView)) {
+                if (isViewsIntersects((FrameLayout.LayoutParams)oldTargetView.getLayoutParams(), targetViewParams)) {
                     intersects = true;
                     break;
                 }
             }
 
             if (!intersects) {
+                targetViewGroup.addView(targetView, targetViewParams);
                 break;
             }
         }
-
-        targetViewGroup.addView(targetView, targetViewParams);
-
     }
 
-    private boolean isViewsIntersects(View a, View b) {
-        return a.getX() < b.getX() + b.getWidth()
-                && a.getX() + a.getWidth() > b.getX()
-                && a.getY() < b.getY() + b.getHeight()
-                && a.getY() + a.getHeight() > b.getY();
+    private boolean isViewsIntersects(FrameLayout.LayoutParams a, FrameLayout.LayoutParams b) {
+        return a.leftMargin < b.leftMargin + b.width
+                && a.leftMargin + a.width > b.leftMargin
+                && a.topMargin < b.topMargin + b.height
+                && a.topMargin + a.height > b.topMargin;
     }
 
     @Override

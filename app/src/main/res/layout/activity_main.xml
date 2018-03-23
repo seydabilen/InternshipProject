@@ -11,16 +11,6 @@
         android:id="@+id/target_root"
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
-        android:layout_height="400dp"></FrameLayout>
-
-
-    <ImageView
-        android:id="@+id/targetView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="200dp"
-        android:layout_marginTop="400dp"
-        android:src="@mipmap/ic_launcher"
-        android:visibility="visible" />
+        android:layout_height="400dp"/>
 
 </FrameLayout>
