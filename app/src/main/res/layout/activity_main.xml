@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/view_root"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/button_focused"
-    android:orientation="vertical">
-
+    android:background="@color/button_pressed">
 
     <FrameLayout
-        android:background="@drawable/img3"
-        android:id="@+id/target_root"
-        android:layout_gravity="bottom"
         android:layout_width="match_parent"
-        android:layout_height="470dp"/>
+        android:layout_height="match_parent"
+        android:layout_marginLeft="100dp">
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/img3" />
+
+        <FrameLayout
+            android:id="@+id/target_root"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <FrameLayout
+            android:id="@+id/view_root"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="ScrollViewSize" />
+
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/iv_restart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_margin="10dp"
+        android:src="@mipmap/ic_launcher" />
 
 </FrameLayout>

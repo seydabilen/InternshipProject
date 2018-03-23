@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.Random;
+
 /**
  * Created by Acer on 8.03.2018.
  */
@@ -21,19 +22,15 @@ import java.util.Random;
 public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton implements View.OnTouchListener {
     private Point firstPoint;
     private ImageView targetView;
-    private ViewGroup viewGroup;
-    private ArrayList<PuzzlePieceView> otherInteractiveViews;
-    private Integer puzzlePieceInitialWidth = 250;
-    private Integer targetFrameWidth = 350;
+    private int puzzlePieceInitialWidth = dp2px(80);
+    private int targetFrameWidth = dp2px(115);
 
     public ImageView getTargetView() {
         return targetView;
     }
 
-    public PuzzlePieceView(Context context, ViewGroup viewGroup, ViewGroup targetViewGroup, ArrayList<PuzzlePieceView> otherInteractiveViews) {
+    public PuzzlePieceView(Context context, ViewGroup puzzlePieceList, ViewGroup targetViewGroup, ArrayList<PuzzlePieceView> otherInteractiveViews) {
         super(context);
-        this.viewGroup = viewGroup;
-        this.otherInteractiveViews = otherInteractiveViews;
         Random randomGenerator = new Random();
 
         setBackgroundColor(getResources().getColor(R.color.button_default));
@@ -41,18 +38,19 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
 
         FrameLayout.LayoutParams interactiveViewLayoutParams = new FrameLayout.LayoutParams(puzzlePieceInitialWidth, puzzlePieceInitialWidth);
 
-        Double leftMargin = otherInteractiveViews.size() * puzzlePieceInitialWidth * 1.25;
-        interactiveViewLayoutParams.leftMargin = leftMargin.intValue();
+        int topMargin = (otherInteractiveViews.size() * puzzlePieceInitialWidth) + (dp2px(10) * (otherInteractiveViews.size() + 1));
+        interactiveViewLayoutParams.topMargin = topMargin;
+        interactiveViewLayoutParams.leftMargin = dp2px(10);
 
-        viewGroup.addView(this, interactiveViewLayoutParams);
+        puzzlePieceList.addView(this, interactiveViewLayoutParams);
 
         targetView = new ImageView(getContext());
         targetView.setImageResource(R.drawable.puzzlepiecemissing0);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int viewGroupWidth = displayMetrics.widthPixels;
-        int viewGroupHeight = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 470, getResources().getDisplayMetrics());
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int viewGroupWidth = displayMetrics.widthPixels - dp2px(100);
+        int viewGroupHeight = displayMetrics.heightPixels;
 
         while (true) {
             targetFrameWidth = randomGenerator.nextInt(100) + puzzlePieceInitialWidth;
@@ -64,7 +62,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
             boolean intersects = false;
             for (int viewIndex = 0; viewIndex < targetViewGroup.getChildCount(); viewIndex++) {
                 View oldTargetView = targetViewGroup.getChildAt(viewIndex);
-                if (isViewsIntersects((FrameLayout.LayoutParams)oldTargetView.getLayoutParams(), targetViewParams)) {
+                if (isViewsIntersects((FrameLayout.LayoutParams) oldTargetView.getLayoutParams(), targetViewParams)) {
                     intersects = true;
                     break;
                 }
@@ -91,7 +89,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                Float ratio = puzzlePieceInitialWidth.floatValue() / targetFrameWidth.floatValue();
+                Float ratio = (float)puzzlePieceInitialWidth / (float)targetFrameWidth;
                 v.setScaleX(v.getScaleX() + ratio);
                 v.setScaleY(v.getScaleY() + ratio);
                 firstPoint = new Point((int) getX(), (int) getY());
@@ -141,5 +139,9 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
         } else {
             interactiveView.returnToOriginalPosition();
         }
+    }
+
+    private int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 }
