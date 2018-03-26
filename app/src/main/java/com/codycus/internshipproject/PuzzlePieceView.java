@@ -22,7 +22,7 @@ import java.util.Random;
 public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton implements View.OnTouchListener {
     private Point firstPoint;
     private ImageView targetView;
-    private int puzzlePieceInitialWidth = dp2px(80);
+    private int puzzlePieceInitialWidth = dp2px(60);
     private int targetFrameWidth = dp2px(115);
 
     public ImageView getTargetView() {
@@ -43,6 +43,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
         interactiveViewLayoutParams.leftMargin = dp2px(10);
 
         puzzlePieceList.addView(this, interactiveViewLayoutParams);
+        firstPoint=new Point((int)interactiveViewLayoutParams.leftMargin,(int)interactiveViewLayoutParams.topMargin);
 
         targetView = new ImageView(getContext());
         targetView.setImageResource(R.drawable.puzzlepiecemissing0);
@@ -89,11 +90,10 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                Float ratio = (float)puzzlePieceInitialWidth / (float)targetFrameWidth;
-                v.setScaleX(v.getScaleX() + ratio);
-                v.setScaleY(v.getScaleY() + ratio);
-                firstPoint = new Point((int) getX(), (int) getY());
-                //Point holds two integer coordinates.0,0
+                Float ratio = (float)targetFrameWidth / (float)puzzlePieceInitialWidth;
+                v.setScaleX(ratio);
+                v.setScaleY(ratio);
+                //firstPoint = new Point((int) getX(), (int) getY());
                 break;
             case MotionEvent.ACTION_UP:
                 v.setBackgroundColor(Color.rgb(255, 214, 28));

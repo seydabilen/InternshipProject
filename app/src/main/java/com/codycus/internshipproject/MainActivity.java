@@ -1,5 +1,6 @@
 package com.codycus.internshipproject;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -12,12 +13,15 @@ public class MainActivity extends AppCompatActivity {
     private ViewGroup puzzlePieceList, targetLayout;
     private ArrayList<PuzzlePieceView> interactiveViews;
     private ImageView restartButton;
+    MediaPlayer backgroundMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
+        backgroundMusic=MediaPlayer.create(MainActivity.this,R.raw.jingle);
+        backgroundMusic.start();
         puzzlePieceList = (ViewGroup) findViewById(R.id.view_root);
         targetLayout = (ViewGroup) findViewById(R.id.target_root);
         restartButton = (ImageView) findViewById(R.id.iv_restart);
@@ -34,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
             puzzlePieceView.setText("Piece " + i);
             interactiveViews.add(puzzlePieceView);
         }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        backgroundMusic.release();
     }
 }
 
