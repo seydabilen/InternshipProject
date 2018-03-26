@@ -2,8 +2,14 @@ package com.codycus.internshipproject;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -19,7 +25,7 @@ import java.util.Random;
  * Created by Acer on 8.03.2018.
  */
 
-public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton implements View.OnTouchListener {
+public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener {
     private Point firstPoint;
     private ImageView targetView;
     private int puzzlePieceInitialWidth = dp2px(60);
@@ -29,11 +35,11 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
         return targetView;
     }
 
-    public PuzzlePieceView(Context context, ViewGroup puzzlePieceList, ViewGroup targetViewGroup, ArrayList<PuzzlePieceView> otherInteractiveViews) {
+    public PuzzlePieceView(Context context, ViewGroup puzzlePieceList, ViewGroup targetViewGroup, ArrayList<PuzzlePieceView> otherInteractiveViews, ImageView backgroundImage) {
         super(context);
         Random randomGenerator = new Random();
 
-        setBackgroundColor(getResources().getColor(R.color.button_default));
+        //setBackgroundColor(getResources().getColor(R.color.button_default));
         setOnTouchListener(this);
 
         FrameLayout.LayoutParams interactiveViewLayoutParams = new FrameLayout.LayoutParams(puzzlePieceInitialWidth, puzzlePieceInitialWidth);
@@ -42,11 +48,8 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
         interactiveViewLayoutParams.topMargin = topMargin;
         interactiveViewLayoutParams.leftMargin = dp2px(10);
 
-        puzzlePieceList.addView(this, interactiveViewLayoutParams);
-        firstPoint=new Point((int)interactiveViewLayoutParams.leftMargin,(int)interactiveViewLayoutParams.topMargin);
-
         targetView = new ImageView(getContext());
-        targetView.setImageResource(R.drawable.puzzlepiecemissing0);
+        targetView.setImageResource(R.drawable.mask_airplane2);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -70,10 +73,31 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
             }
 
             if (!intersects) {
+                BitmapDrawable drawable = (BitmapDrawable) backgroundImage.getDrawable();
+                Bitmap originalImage = drawable.getBitmap();
+                Bitmap originalMask = BitmapFactory.decodeResource(getResources(), R.drawable.mask_airplane2);
+                double originalMaskRatio = originalMask.getWidth() / originalMask.getHeight();
+                Bitmap croppedBitmap = Bitmap.createBitmap(originalImage, targetViewParams.leftMargin, targetViewParams.topMargin, targetViewParams.width, (int) (targetViewParams.width / originalMaskRatio));
+
+                Bitmap resizedMask = Bitmap.createScaledBitmap(originalMask, targetViewParams.width, (int) (targetViewParams.width / originalMaskRatio), false);
+                Bitmap result = Bitmap.createBitmap(resizedMask.getWidth(), resizedMask.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas mCanvas = new Canvas(result);
+                Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+                mCanvas.drawBitmap(croppedBitmap, 0, 0, null);
+                mCanvas.drawBitmap(resizedMask, 0, 0, paint);
+                paint.setXfermode(null);
+                setScaleType(ScaleType.FIT_CENTER);
+                setImageBitmap(result);
+
+
                 targetViewGroup.addView(targetView, targetViewParams);
                 break;
             }
         }
+
+        puzzlePieceList.addView(this, interactiveViewLayoutParams);
+        firstPoint = new Point((int) interactiveViewLayoutParams.leftMargin, (int) interactiveViewLayoutParams.topMargin);
     }
 
     private boolean isViewsIntersects(FrameLayout.LayoutParams a, FrameLayout.LayoutParams b) {
@@ -90,13 +114,12 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                Float ratio = (float)targetFrameWidth / (float)puzzlePieceInitialWidth;
+                Float ratio = (float) targetFrameWidth / (float) puzzlePieceInitialWidth;
                 v.setScaleX(ratio);
                 v.setScaleY(ratio);
-                //firstPoint = new Point((int) getX(), (int) getY());
                 break;
             case MotionEvent.ACTION_UP:
-                v.setBackgroundColor(Color.rgb(255, 214, 28));
+                //v.setBackgroundColor(Color.rgb(255, 214, 28));
                 v.setScaleX(1);
                 v.setScaleY(1);
                 this.onDropView(this, event);
@@ -106,10 +129,8 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatButton i
             case MotionEvent.ACTION_POINTER_UP:
                 break;
             case MotionEvent.ACTION_MOVE:
-                v.setBackgroundColor(Color.GREEN);
+                //v.setBackgroundColor(Color.GREEN);
                 animate().setDuration(0).x(event.getRawX() - getWidth() / 2).y(event.getRawY() - getHeight()).start();
-                //if you want to move the view from its center,
-                // you only have to substract the view's half height and width to the movement.
                 break;
             case MotionEvent.ACTION_CANCEL:
                 break;
