@@ -10,6 +10,7 @@ import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -30,6 +31,8 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
     private ImageView targetView;
     private int puzzlePieceInitialWidth = dp2px(60);
     private int targetFrameWidth = dp2px(115);
+    MediaPlayer expand,shrink,fit,success;
+
 
     public ImageView getTargetView() {
         return targetView;
@@ -78,7 +81,6 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
                 Bitmap originalMask = BitmapFactory.decodeResource(getResources(), R.drawable.mask_airplane2);
                 double originalMaskRatio = originalMask.getWidth() / originalMask.getHeight();
                 Bitmap croppedBitmap = Bitmap.createBitmap(originalImage, targetViewParams.leftMargin, targetViewParams.topMargin, targetViewParams.width, (int) (targetViewParams.width / originalMaskRatio));
-
                 Bitmap resizedMask = Bitmap.createScaledBitmap(originalMask, targetViewParams.width, (int) (targetViewParams.width / originalMaskRatio), false);
                 Bitmap result = Bitmap.createBitmap(resizedMask.getWidth(), resizedMask.getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas mCanvas = new Canvas(result);
@@ -112,14 +114,16 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
         int X = (int) event.getRawX();
         int Y = (int) event.getRawY();
 
+
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
+                expand = MediaPlayer.create(getContext(), R.raw.expand);
+                expand.start();
                 Float ratio = (float) targetFrameWidth / (float) puzzlePieceInitialWidth;
                 v.setScaleX(ratio);
                 v.setScaleY(ratio);
                 break;
             case MotionEvent.ACTION_UP:
-                //v.setBackgroundColor(Color.rgb(255, 214, 28));
                 v.setScaleX(1);
                 v.setScaleY(1);
                 this.onDropView(this, event);
@@ -129,7 +133,6 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
             case MotionEvent.ACTION_POINTER_UP:
                 break;
             case MotionEvent.ACTION_MOVE:
-                //v.setBackgroundColor(Color.GREEN);
                 animate().setDuration(0).x(event.getRawX() - getWidth() / 2).y(event.getRawY() - getHeight()).start();
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -140,6 +143,8 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
     }
 
     public void returnToOriginalPosition() {
+        shrink = MediaPlayer.create(getContext(), R.raw.shrink);
+        shrink.start();
         animate().setDuration(200).x(firstPoint.x).y(firstPoint.y).start();
     }
 
@@ -155,6 +160,10 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
                 && (y > targetViewMinY && y < (targetViewMinY + targetView.getHeight()));
 
         if (intersects) {
+            fit = MediaPlayer.create(getContext(), R.raw.fit);
+            fit.start();
+            success = MediaPlayer.create(getContext(), R.raw.success);
+            success.start();
             interactiveView.setVisibility(View.GONE);
             targetView.setVisibility(View.GONE);
         } else {

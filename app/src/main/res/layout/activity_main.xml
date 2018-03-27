@@ -3,7 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/button_pressed">
+    android:background="@drawable/background">
+    <TextView
+        android:id="@+id/level_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" "
+        android:textStyle="bold"
+        android:layout_gravity="bottom"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -15,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            android:src="@drawable/img3" />
+            android:src="@drawable/bg1" />
 
         <FrameLayout
             android:id="@+id/target_root"
@@ -38,10 +45,10 @@
 
     <ImageView
         android:id="@+id/iv_restart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_gravity="top|right"
         android:layout_margin="10dp"
-        android:src="@mipmap/ic_launcher" />
+        android:src="@drawable/help" />
 
 </FrameLayout>
