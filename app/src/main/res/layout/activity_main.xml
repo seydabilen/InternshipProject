@@ -4,13 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background">
-    <TextView
-        android:id="@+id/level_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=" "
-        android:textStyle="bold"
-        android:layout_gravity="bottom"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -21,8 +14,7 @@
             android:id="@+id/iv_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/bg1" />
+            android:scaleType="fitXY"/>
 
         <FrameLayout
             android:id="@+id/target_root"
@@ -50,5 +42,14 @@
         android:layout_gravity="top|right"
         android:layout_margin="10dp"
         android:src="@drawable/help" />
+
+    <TextView
+        android:id="@+id/level_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:text=" "
+        android:layout_marginLeft="4dp"
+        android:textStyle="bold" />
 
 </FrameLayout>
