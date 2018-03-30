@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         }
         backgroundMusic = MediaPlayer.create(MainActivity.this, R.raw.background);
         backgroundMusic.start();
+        backgroundMusic.setLooping(true);
         puzzlePieceList = (ViewGroup) findViewById(R.id.view_root);
         targetLayout = (ViewGroup) findViewById(R.id.target_root);
         restartButton = (ImageView) findViewById(R.id.iv_restart);
@@ -42,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
         restartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recreate();
+                levelUp();
+
             }
         });
 
@@ -68,12 +72,17 @@ public class MainActivity extends AppCompatActivity {
         levelid.setText("Level " + levelNumber);
         puzzlePieceList.removeAllViews();
         backgroundImage.setImageResource(getRandomBackground());
+        Animation animSlide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_out);
+        animSlide.setFillAfter(true);
+        backgroundImage.startAnimation(animSlide);
 
         interactiveViews = new ArrayList<PuzzlePieceView>();
+
         for (int i = 0; i < levelNumber; i++) {
             PuzzlePieceView puzzlePieceView = new PuzzlePieceView(this, puzzlePieceList, targetLayout, interactiveViews, backgroundImage);
             interactiveViews.add(puzzlePieceView);
         }
+
     }
 
     private int getRandomBackground() {
