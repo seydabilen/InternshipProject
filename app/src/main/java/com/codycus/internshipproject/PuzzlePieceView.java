@@ -30,7 +30,7 @@ import java.util.Random;
 public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener {
     private Point firstPoint;
     private ImageView targetView;
-    private int puzzlePieceInitialWidth = dp2px(60);
+    private int puzzlePieceInitialWidth = dp2px(50);
     private int targetFrameWidth = dp2px(115);
     private MediaPlayer expand, shrink, fit, success;
     private int viewGroupWidth, viewGroupHeight;
@@ -43,13 +43,11 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
 
     public PuzzlePieceView(Context context, ViewGroup puzzlePieceList, ViewGroup targetViewGroup, ArrayList<PuzzlePieceView> otherInteractiveViews, ImageView backgroundImage) {
         super(context);
-        Random randomGenerator = new Random();
-
-        //setBackgroundColor(getResources().getColor(R.color.button_default));
         setOnTouchListener(this);
 
-        FrameLayout.LayoutParams interactiveViewLayoutParams = new FrameLayout.LayoutParams(puzzlePieceInitialWidth, puzzlePieceInitialWidth);
+        Random randomGenerator = new Random();
 
+        FrameLayout.LayoutParams interactiveViewLayoutParams = new FrameLayout.LayoutParams(puzzlePieceInitialWidth, puzzlePieceInitialWidth);
         int topMargin = (otherInteractiveViews.size() * puzzlePieceInitialWidth) + (dp2px(10) * (otherInteractiveViews.size() + 1));
         interactiveViewLayoutParams.topMargin = topMargin;
         interactiveViewLayoutParams.leftMargin = dp2px(10);
@@ -64,7 +62,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
         viewGroupHeight = displayMetrics.heightPixels;
 
         while (true) {
-            targetFrameWidth = randomGenerator.nextInt(100) + puzzlePieceInitialWidth;
+            targetFrameWidth = randomGenerator.nextInt(200) + puzzlePieceInitialWidth;
             FrameLayout.LayoutParams targetViewParams = new FrameLayout.LayoutParams(targetFrameWidth, targetFrameWidth);
             targetViewParams.leftMargin = randomGenerator.nextInt(Math.max(0, (viewGroupWidth - targetFrameWidth))) + 1;
             targetViewParams.topMargin = randomGenerator.nextInt(Math.max(0, (viewGroupHeight - targetFrameWidth))) + 1;
@@ -173,10 +171,17 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
             fit.start();
             success = MediaPlayer.create(getContext(), R.raw.success);
             success.start();
-            ((ViewGroup) interactiveView.getParent()).removeView(interactiveView);
-            ((ViewGroup) targetView.getParent()).removeView(targetView);
+            makeCompleted();
         } else {
             interactiveView.returnToOriginalPosition();
+        }
+    }
+
+    public void makeCompleted() {
+        if ( null != targetView.getParent()) {
+            ((ViewGroup) targetView.getParent()).removeView(targetView);
+            //((ViewGroup) this.getParent()).removeView(this);
+
         }
     }
 
