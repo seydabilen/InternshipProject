@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,7 +15,7 @@
             android:id="@+id/iv_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY" />
 
         <FrameLayout
             android:id="@+id/target_root"
@@ -22,18 +23,10 @@
             android:layout_height="match_parent" />
     </FrameLayout>
 
-    <ScrollView
+    <FrameLayout
+        android:id="@+id/fl_puzzle_piece_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <FrameLayout
-            android:id="@+id/view_root"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:ignore="ScrollViewSize" />
-
-    </ScrollView>
+        android:layout_height="match_parent" />
 
     <ImageView
         android:id="@+id/iv_restart"
@@ -48,8 +41,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:text=" "
-        android:layout_marginLeft="4dp"
+        android:textColor="#002DFF"
+        android:textSize="16dp"
+        android:layout_marginLeft="8dp"
         android:textStyle="bold" />
 
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/bottomAdView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="80dp"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
 </FrameLayout>

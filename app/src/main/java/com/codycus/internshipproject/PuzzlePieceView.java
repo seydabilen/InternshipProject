@@ -10,7 +10,6 @@ import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -29,17 +27,13 @@ import java.util.Random;
 
 public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener {
     private Point firstPoint;
-    private ImageView targetView;
+    private ImageView blackMaskView;
     private int puzzlePieceInitialWidth = dp2px(50);
-    private int targetFrameWidth = dp2px(115);
-    private MediaPlayer expand, shrink, fit, success;
+    private int puzzlePieceInitialHeight;
+    private int targetFrameWidth;
+    private int targetFrameHeight;
     private int viewGroupWidth, viewGroupHeight;
     private int maskResourceId;
-
-
-    public ImageView getTargetView() {
-        return targetView;
-    }
 
     public PuzzlePieceView(Context context, ViewGroup puzzlePieceList, ViewGroup targetViewGroup, ArrayList<PuzzlePieceView> otherInteractiveViews, ImageView backgroundImage) {
         super(context);
@@ -47,14 +41,21 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
 
         Random randomGenerator = new Random();
 
-        FrameLayout.LayoutParams interactiveViewLayoutParams = new FrameLayout.LayoutParams(puzzlePieceInitialWidth, puzzlePieceInitialWidth);
-        int topMargin = (otherInteractiveViews.size() * puzzlePieceInitialWidth) + (dp2px(10) * (otherInteractiveViews.size() + 1));
-        interactiveViewLayoutParams.topMargin = topMargin;
+        blackMaskView = new ImageView(getContext());
+        maskResourceId = getRandomMask();
+        Bitmap originalMask = BitmapFactory.decodeResource(getResources(), maskResourceId);
+
+        puzzlePieceInitialHeight = (int) ((double) originalMask.getHeight() / (double) originalMask.getWidth() * (double) puzzlePieceInitialWidth);
+
+        FrameLayout.LayoutParams interactiveViewLayoutParams = new FrameLayout.LayoutParams(puzzlePieceInitialWidth, puzzlePieceInitialHeight);
+        int marginSum = dp2px(10);
+        for (View view : otherInteractiveViews) {
+            marginSum += view.getLayoutParams().height + dp2px(10);
+        }
+        interactiveViewLayoutParams.topMargin = marginSum;
         interactiveViewLayoutParams.leftMargin = dp2px(10);
 
-        targetView = new ImageView(getContext());
-        maskResourceId = getRandomMask();
-        targetView.setImageResource(maskResourceId);
+        blackMaskView.setImageResource(maskResourceId);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -62,18 +63,21 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
         viewGroupHeight = displayMetrics.heightPixels;
 
         while (true) {
-            targetFrameWidth = randomGenerator.nextInt(200) + puzzlePieceInitialWidth;
-            FrameLayout.LayoutParams targetViewParams = new FrameLayout.LayoutParams(targetFrameWidth, targetFrameWidth);
+            targetFrameWidth = randomGenerator.nextInt(dp2px(80)) + puzzlePieceInitialWidth;
+            targetFrameHeight = (int) ((double) originalMask.getHeight() / (double) originalMask.getWidth() * (double) targetFrameWidth);
+            FrameLayout.LayoutParams targetViewParams = new FrameLayout.LayoutParams(targetFrameWidth, targetFrameHeight);
             targetViewParams.leftMargin = randomGenerator.nextInt(Math.max(0, (viewGroupWidth - targetFrameWidth))) + 1;
-            targetViewParams.topMargin = randomGenerator.nextInt(Math.max(0, (viewGroupHeight - targetFrameWidth))) + 1;
-            targetView.setLayoutParams(targetViewParams);
+            targetViewParams.topMargin = randomGenerator.nextInt(Math.max(0, (viewGroupHeight - dp2px(60) - targetFrameWidth))) + 1;
+            blackMaskView.setLayoutParams(targetViewParams);
 
             boolean intersects = false;
             for (int viewIndex = 0; viewIndex < targetViewGroup.getChildCount(); viewIndex++) {
-                View oldTargetView = targetViewGroup.getChildAt(viewIndex);
-                if (isViewsIntersects((FrameLayout.LayoutParams) oldTargetView.getLayoutParams(), targetViewParams)) {
-                    intersects = true;
-                    break;
+                View otherPieceView = targetViewGroup.getChildAt(viewIndex);
+                if (otherPieceView != null) {
+                    if (isViewsIntersects((FrameLayout.LayoutParams) otherPieceView.getLayoutParams(), targetViewParams)) {
+                        intersects = true;
+                        break;
+                    }
                 }
             }
 
@@ -83,11 +87,12 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
                 double widthAspect = (double) originalImage.getWidth() / (double) viewGroupWidth;
                 double heightAspect = (double) originalImage.getHeight() / (double) viewGroupHeight;
 
-                Bitmap originalMask = BitmapFactory.decodeResource(getResources(), maskResourceId);
-                double originalMaskRatio = originalMask.getWidth() / originalMask.getHeight();
-                Bitmap croppedBitmap = Bitmap.createBitmap(originalImage, (int) (targetViewParams.leftMargin * widthAspect), (int) (targetViewParams.topMargin * heightAspect), (int) (targetViewParams.width * widthAspect), (int) (targetViewParams.height * heightAspect));
-                Bitmap resizedMask = Bitmap.createScaledBitmap(originalMask, croppedBitmap.getWidth(), croppedBitmap.getWidth(), false);
+                Bitmap croppedBitmap = Bitmap.createBitmap(originalImage, (int) (targetViewParams.leftMargin * widthAspect), (int) (targetViewParams.topMargin * heightAspect), (int) (targetViewParams.width * widthAspect), (int) (targetViewParams.height * widthAspect));
+
+                Bitmap resizedMask = Bitmap.createScaledBitmap(originalMask, croppedBitmap.getWidth(), croppedBitmap.getHeight(), false);
+
                 Bitmap result = Bitmap.createBitmap(resizedMask.getWidth(), resizedMask.getHeight(), Bitmap.Config.ARGB_8888);
+
                 Canvas mCanvas = new Canvas(result);
                 Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
                 paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
@@ -98,7 +103,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
                 setImageBitmap(result);
 
 
-                targetViewGroup.addView(targetView, targetViewParams);
+                targetViewGroup.addView(blackMaskView, targetViewParams);
                 break;
             }
         }
@@ -119,20 +124,14 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
         int X = (int) event.getRawX();
         int Y = (int) event.getRawY();
 
-
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                ((ScrollView) ((FrameLayout) v.getParent()).getParent()).requestDisallowInterceptTouchEvent(true);
-                expand = MediaPlayer.create(getContext(), R.raw.expand);
-                expand.start();
+                MainActivity.playExpandSound();
                 Float ratio = (float) targetFrameWidth / (float) puzzlePieceInitialWidth;
-                v.setScaleX(ratio);
-                v.setScaleY(ratio);
+                animate().setDuration(300).scaleX(ratio).scaleY(ratio);
                 break;
             case MotionEvent.ACTION_UP:
-                ((ScrollView) ((FrameLayout) v.getParent()).getParent()).requestDisallowInterceptTouchEvent(false);
-                v.setScaleX(1);
-                v.setScaleY(1);
+                animate().setDuration(500).scaleX(1).scaleY(1);
                 this.onDropView(this, event);
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -150,27 +149,24 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
     }
 
     public void returnToOriginalPosition() {
-        shrink = MediaPlayer.create(getContext(), R.raw.shrink);
-        shrink.start();
+        MainActivity.playShrinkSound();
         animate().setDuration(200).x(firstPoint.x).y(firstPoint.y).start();
     }
 
     public void onDropView(PuzzlePieceView interactiveView, MotionEvent event) {
+        MainActivity.playFitSound();
 
         Float x = event.getRawX() - interactiveView.getWidth() / 4;
         Float y = event.getRawY() - interactiveView.getHeight() / 4;
         int[] location = new int[2];
-        targetView.getLocationOnScreen(location);
+        blackMaskView.getLocationOnScreen(location);
         int targetViewMinX = location[0];
         int targetViewMinY = location[1];
-        Boolean intersects = (x > targetViewMinX && x < (targetViewMinX + targetView.getWidth()))
-                && (y > targetViewMinY && y < (targetViewMinY + targetView.getHeight()));
+        Boolean intersects = (x > targetViewMinX && x < (targetViewMinX + blackMaskView.getWidth()))
+                && (y > targetViewMinY && y < (targetViewMinY + blackMaskView.getHeight()));
 
         if (intersects) {
-            fit = MediaPlayer.create(getContext(), R.raw.fit);
-            fit.start();
-            success = MediaPlayer.create(getContext(), R.raw.success);
-            success.start();
+            MainActivity.playSuccessSound();
             makeCompleted();
         } else {
             interactiveView.returnToOriginalPosition();
@@ -178,10 +174,12 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
     }
 
     public void makeCompleted() {
-        if ( null != targetView.getParent()) {
-            ((ViewGroup) targetView.getParent()).removeView(targetView);
-            //((ViewGroup) this.getParent()).removeView(this);
+        if (blackMaskView.getParent() != null) {
+            ((ViewGroup) blackMaskView.getParent()).removeView(blackMaskView);
+        }
 
+        if (this.getParent() != null) {
+            ((ViewGroup) this.getParent()).removeView(this);
         }
     }
 
@@ -189,7 +187,7 @@ public class PuzzlePieceView extends android.support.v7.widget.AppCompatImageVie
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
-    private int getRandomMask(){
-        return this.getResources().getIdentifier("mask_" + new Random().nextInt(16), "drawable", getContext().getPackageName());
+    private int getRandomMask() {
+        return this.getResources().getIdentifier("mask_" + new Random().nextInt(15), "drawable", getContext().getPackageName());
     }
 }
